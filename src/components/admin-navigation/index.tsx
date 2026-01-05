@@ -15,6 +15,7 @@ import {
 } from "@radix-ui/react-navigation-menu";
 import Auth from "../auth";
 import { Signup } from "../forms/signup";
+import { Signin } from "../forms/signin";
 
 function Navigation() {
   const pathname = usePathname();
@@ -60,7 +61,7 @@ function Navigation() {
           description="Fill the form to sign up"
           title="Signin"
         >
-          <Signup />
+          <Signin />
         </Auth>
       </div>
     </div>

@@ -1,14 +1,14 @@
-"use server"
+"use server";
 
-import { SignupSchema, type SignupInput } from "@/lib/validators/signup.schema";
+import { SignupSchema } from "@/lib/validators/signup.schema";
 import { prisma } from "../../../../lib/db";
-import { getHashedPassword, isPasswordSame } from "@/utils/auth/utils";
+import { isPasswordSame } from "@/utils/auth/utils";
 import { logger } from "../../../../lib/piano";
 import type { User } from "@/generated/prisma/client";
 import crypto from "crypto";
 import { redis } from "../../../../lib/redis";
-import { SigninSchema,SigninInput } from "@/lib/validators/signin.schema";
-import { email } from "zod";
+import { SigninSchema, SigninInput } from "@/lib/validators/signin.schema";
+import { setSessionCookie } from "./set-cookie-action";
 
 type PublicUser = Omit<User, "password">;
 
@@ -16,15 +16,13 @@ export default async function signInUser(
   userDetails: SigninInput
 ): Promise<PublicUser> {
   try {
-
-
     const user = await prisma.user.findUnique({
-        where: {
-            name: userDetails.username
-        }
+      where: {
+        name: userDetails.username,
+      },
     });
 
-    if (user) {
+    if (!user) {
       throw new Error("Username or Password is wrong");
     }
 
@@ -37,21 +35,24 @@ export default async function signInUser(
 
     const { password, username } = userDetails;
 
-    const isCorrectPassword = await isPasswordSame(password, userDetails.password);
+    const isCorrectPassword = await isPasswordSame(password, user.password);
 
-    if(isCorrectPassword){
-        throw new Error("Username or Password is wrong");
+    if (!isCorrectPassword) {
+      throw new Error("Username or Password is wrong");
     }
 
     const sessionId = crypto.randomBytes(32).toString("hex");
 
     await redis.set(
       sessionId,
-      JSON.stringify({ userId: savedUser.id }),
+      JSON.stringify({ userId: user.id }),
       { ex: 30 } // 10 minutes
     );
 
-    return savedUser;
+    await setSessionCookie(sessionId);
+
+    const { password: _, ...publicUser } = user;
+    return publicUser;
   } catch (err: any) {
     const safeInput = SignupSchema.omit({ password: true }).safeParse(
       userDetails

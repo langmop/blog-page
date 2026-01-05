@@ -13,8 +13,10 @@ import { Button } from "@/components/ui/button";
 import addUser from "@/lib/actions/auth/add-user-action";
 import { SignupSchema, type SignupInput } from "@/lib/validators/signup.schema";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export function Signup() {
+  const router = useRouter();
   const form = useForm<SignupInput>({
     resolver: zodResolver(SignupSchema),
     defaultValues: {
@@ -28,13 +30,16 @@ export function Signup() {
   async function onSubmit(data: SignupInput) {
     try {
       const response = await addUser(data);
-      if(response.id){
-        toast.success("User created successfully")
+      if (response.id) {
+        toast.success("User created successfully");
       }
     } catch (err: any) {
       toast("Attempt failed while creating user", {
         description: err.message,
       });
+    } finally {
+      router.push("/dashboard");
+      router.refresh();
     }
   }
 
@@ -59,6 +64,23 @@ export function Signup() {
           )}
         />
         <Controller
+          name="username"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor="form-rhf-demo-title">Username</FieldLabel>
+              <Input
+                {...field}
+                id="username"
+                aria-invalid={fieldState.invalid}
+                placeholder="Username"
+                autoComplete="off"
+              />
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+        <Controller
           name="password"
           control={form.control}
           render={({ field, fieldState }) => (
@@ -70,23 +92,6 @@ export function Signup() {
                 id="password"
                 aria-invalid={fieldState.invalid}
                 placeholder="Password"
-                autoComplete="off"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
-        <Controller
-          name="username"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="form-rhf-demo-title">Username</FieldLabel>
-              <Input
-                {...field}
-                id="username"
-                aria-invalid={fieldState.invalid}
-                placeholder="Username"
                 autoComplete="off"
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

@@ -1,5 +1,4 @@
 "use server";
-import z from "zod";
 import { SignupSchema, type SignupInput } from "@/lib/validators/signup.schema";
 import { prisma } from "../../../../lib/db";
 import { getHashedPassword } from "@/utils/auth/utils";
@@ -7,6 +6,7 @@ import { logger } from "../../../../lib/piano";
 import type { User } from "@/generated/prisma/client";
 import crypto from "crypto";
 import { redis } from "../../../../lib/redis";
+import { setSessionCookie } from "./set-cookie-action";
 
 type PublicUser = Omit<User, "password">;
 
@@ -57,6 +57,8 @@ export default async function addUser(
       JSON.stringify({ userId: savedUser.id }),
       { ex: 30 } // 10 minutes
     );
+
+    await setSessionCookie(sessionId);
 
     return savedUser;
   } catch (err: any) {
