@@ -11,21 +11,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import addUser from "@/lib/actions/auth/add-user-action";
-import { SignupSchema, type SignupInput } from "@/lib/validators/signup.schema";
 import { toast } from "sonner";
+import { SigninInput, SigninSchema } from "@/lib/validators/signin.schema";
 
 export function Signup() {
-  const form = useForm<SignupInput>({
-    resolver: zodResolver(SignupSchema),
+  const form = useForm<SigninInput>({
+    resolver: zodResolver(SigninSchema),
     defaultValues: {
       password: "",
       username: "",
-      email: "",
     },
     mode: "onChange",
   });
 
-  async function onSubmit(data: SignupInput) {
+  async function onSubmit(data: SigninInput) {
     try {
       const response = await addUser(data);
       if(response.id){
@@ -41,23 +40,6 @@ export function Signup() {
   return (
     <form id="form-signup" onSubmit={form.handleSubmit(onSubmit)}>
       <FieldGroup className="gap-4">
-        <Controller
-          name="email"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor="form-email">Email</FieldLabel>
-              <Input
-                {...field}
-                type="email"
-                id="email"
-                aria-invalid={fieldState.invalid}
-                placeholder="Email"
-              />
-              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
         <Controller
           name="password"
           control={form.control}

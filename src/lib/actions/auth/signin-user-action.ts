@@ -1,56 +1,49 @@
-"use server";
-import z from "zod";
+"use server"
+
 import { SignupSchema, type SignupInput } from "@/lib/validators/signup.schema";
 import { prisma } from "../../../../lib/db";
-import { getHashedPassword } from "@/utils/auth/utils";
+import { getHashedPassword, isPasswordSame } from "@/utils/auth/utils";
 import { logger } from "../../../../lib/piano";
 import type { User } from "@/generated/prisma/client";
 import crypto from "crypto";
 import { redis } from "../../../../lib/redis";
+import { SigninSchema,SigninInput } from "@/lib/validators/signin.schema";
+import { email } from "zod";
 
 type PublicUser = Omit<User, "password">;
 
-export default async function addUser(
-  userDetails: SignupInput
+export default async function signInUser(
+  userDetails: SigninInput
 ): Promise<PublicUser> {
   try {
+
+
     const user = await prisma.user.findUnique({
-      where: {
-        email: userDetails.email,
-      },
+        where: {
+            name: userDetails.username
+        }
     });
 
     if (user) {
-      throw new Error("User already has an existing account please login");
+      throw new Error("Username or Password is wrong");
     }
 
-    const parsed = SignupSchema.safeParse(userDetails);
+    const parsed = SigninSchema.safeParse(userDetails);
 
     if (!parsed.success) {
       logger.warn({ input: parsed.error.flatten() }, "Invalid signup payload");
       throw new Error("Invalid input");
     }
 
-    const { email, password, username } = userDetails;
+    const { password, username } = userDetails;
 
-    const hashedPassword = await getHashedPassword(password);
+    const isCorrectPassword = await isPasswordSame(password, userDetails.password);
+
+    if(isCorrectPassword){
+        throw new Error("Username or Password is wrong");
+    }
 
     const sessionId = crypto.randomBytes(32).toString("hex");
-
-    const savedUser = await prisma.user.create({
-      data: {
-        email,
-        name: username,
-        password: hashedPassword,
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
 
     await redis.set(
       sessionId,

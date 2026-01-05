@@ -1,6 +1,6 @@
 "use client";
 import useAuthDetails from "@/hooks/useAuthDetails";
-import React from "react";
+import React, { ReactNode } from "react";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -8,11 +8,21 @@ import {
   DialogDescription,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog"
+} from "../ui/dialog";
 import { Signup } from "../forms/signup";
 import { DialogHeader } from "../ui/dialog";
 
-function Auth() {
+function Auth({
+  buttonName,
+  title,
+  description,
+  children,
+}: {
+  buttonName: string;
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
   const auth = useAuthDetails();
   if (auth.isAuthenticated) {
     return <Button variant="outline">Logout</Button>;
@@ -20,16 +30,14 @@ function Auth() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Login</Button>
+        <Button variant="outline">{buttonName}</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Signup</DialogTitle>
-          <DialogDescription>
-            Fill your details here to signup.
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <Signup />
+        {children}
       </DialogContent>
     </Dialog>
   );

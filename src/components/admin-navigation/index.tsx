@@ -14,6 +14,7 @@ import {
   NavigationMenuList,
 } from "@radix-ui/react-navigation-menu";
 import Auth from "../auth";
+import { Signup } from "../forms/signup";
 
 function Navigation() {
   const pathname = usePathname();
@@ -47,7 +48,20 @@ function Navigation() {
         </NavigationMenu>
       </div>
       <div className="w-fit mr-2">
-        <Auth />
+        <Auth
+          buttonName="Signup"
+          description="Fill the form to sign up"
+          title="Signup"
+        >
+          <Signup />
+        </Auth>
+        <Auth
+          buttonName="Signin"
+          description="Fill the form to sign up"
+          title="Signin"
+        >
+          <Signup />
+        </Auth>
       </div>
     </div>
   );
