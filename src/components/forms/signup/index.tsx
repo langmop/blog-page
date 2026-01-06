@@ -15,7 +15,7 @@ import { SignupSchema, type SignupInput } from "@/lib/validators/signup.schema";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-export function Signup() {
+export function Signup({ onSuccess }: { onSuccess: () => void }) {
   const router = useRouter();
   const form = useForm<SignupInput>({
     resolver: zodResolver(SignupSchema),
@@ -38,7 +38,8 @@ export function Signup() {
         description: err.message,
       });
     } finally {
-      router.push("/dashboard");
+      onSuccess()
+      router.push("/admin");
       router.refresh();
     }
   }

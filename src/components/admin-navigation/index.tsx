@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UNAUTH_NAVIGATIONS } from "./constants";
-import { useCallback } from "react";
+import { useCallback, useContext, useState } from "react";
 import classNames from "classnames";
 import {
   NavigationMenu,
@@ -16,6 +16,7 @@ import {
 import Auth from "../auth";
 import { Signup } from "../forms/signup";
 import { Signin } from "../forms/signin";
+import AuthProvider, { AuthContext } from "@/contexts/auth/provider";
 
 function Navigation() {
   const pathname = usePathname();
@@ -26,6 +27,17 @@ function Navigation() {
     },
     [pathname]
   );
+
+  const [isSignUpOpen, setIsSignUpOpen] = useState(false);
+  const [isSignInOpen, setIsSignInOpen] = useState(false);
+  const onSuccessSignUp = () => {
+    setIsSignUpOpen(false);
+  };
+  const onSuccessSignIn = () => {
+    setIsSignInOpen(false);
+  };
+
+  const { user } = useContext(AuthContext);
 
   return (
     <div className="flex w-full mt-4">
@@ -48,22 +60,28 @@ function Navigation() {
           </NavigationMenuList>
         </NavigationMenu>
       </div>
-      <div className="w-fit mr-2">
-        <Auth
-          buttonName="Signup"
-          description="Fill the form to sign up"
-          title="Signup"
-        >
-          <Signup />
-        </Auth>
-        <Auth
-          buttonName="Signin"
-          description="Fill the form to sign up"
-          title="Signin"
-        >
-          <Signin />
-        </Auth>
-      </div>
+      {user?.userId ? null : (
+        <div className="w-fit mr-2">
+          <Auth
+            buttonName="Signup"
+            description="Fill the form to sign up"
+            title="Signup"
+            open={isSignUpOpen}
+            setOpen={setIsSignUpOpen}
+          >
+            <Signup onSuccess={onSuccessSignUp} />
+          </Auth>
+          <Auth
+            buttonName="Signin"
+            description="Fill the form to sign up"
+            title="Signin"
+            open={isSignInOpen}
+            setOpen={setIsSignInOpen}
+          >
+            <Signin onSuccess={onSuccessSignIn} />
+          </Auth>
+        </div>
+      )}
     </div>
   );
 }

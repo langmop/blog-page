@@ -12,8 +12,10 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { SigninInput, SigninSchema } from "@/lib/validators/signin.schema";
 import signInUser from "@/lib/actions/auth/signin-user-action";
+import { useRouter } from "next/navigation";
 
-export function Signin() {
+export function Signin({ onSuccess }: { onSuccess: () => void }) {
+  const router = useRouter();
   const form = useForm<SigninInput>({
     resolver: zodResolver(SigninSchema),
     defaultValues: {
@@ -33,6 +35,10 @@ export function Signin() {
       toast("Attempt failed while signing user", {
         description: err.message,
       });
+    } finally {
+      onSuccess();
+      router.push("/admin");
+      router.refresh();
     }
   }
 

@@ -1,6 +1,6 @@
 "use client";
 import useAuthDetails from "@/hooks/useAuthDetails";
-import React, { ReactNode } from "react";
+import React, { Dispatch, ReactNode, SetStateAction } from "react";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -17,20 +17,26 @@ function Auth({
   title,
   description,
   children,
+  open,
+  setOpen,
 }: {
   buttonName: string;
   title: string;
   description: string;
   children: ReactNode;
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
 }) {
   const auth = useAuthDetails();
   if (auth.isAuthenticated) {
     return <Button variant="outline">Logout</Button>;
   }
   return (
-    <Dialog>
+    <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
-        <Button variant="outline">{buttonName}</Button>
+        <Button onClick={() => setOpen((prev) => !prev)} variant="outline">
+          {buttonName}
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
