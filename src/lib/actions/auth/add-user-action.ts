@@ -55,7 +55,7 @@ export default async function addUser(
     await redis.set(
       sessionId,
       JSON.stringify({ userId: savedUser.id }),
-      { ex: 30 } // 10 minutes
+      { ex: +(process.env.SESSION_LIVE_AGE ?? 0) } // 10 minutes
     );
 
     await setSessionCookie(sessionId);

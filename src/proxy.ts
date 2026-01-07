@@ -8,6 +8,8 @@ export function proxy(request: NextRequest) {
   const sessionCookie = request.cookies.get("session_id")?.value;
   if (pathname.startsWith("/admin/") && !sessionCookie) {
     return NextResponse.redirect(new URL("/", request.url));
+  } else if (pathname === "/admin" && sessionCookie) {
+    return NextResponse.redirect(new URL("/admin/dashboard", request.url));
   }
 
   return NextResponse.next();

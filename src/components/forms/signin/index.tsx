@@ -13,9 +13,12 @@ import { toast } from "sonner";
 import { SigninInput, SigninSchema } from "@/lib/validators/signin.schema";
 import signInUser from "@/lib/actions/auth/signin-user-action";
 import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { AuthContext } from "@/contexts/auth/provider";
 
 export function Signin({ onSuccess }: { onSuccess: () => void }) {
   const router = useRouter();
+  const { setUser } = useContext(AuthContext);
   const form = useForm<SigninInput>({
     resolver: zodResolver(SigninSchema),
     defaultValues: {
@@ -30,6 +33,9 @@ export function Signin({ onSuccess }: { onSuccess: () => void }) {
       const response = await signInUser(data);
       if (response.id) {
         toast.success("User signedIn successfully");
+        setUser({
+          userId: String(response.id),
+        });
       }
     } catch (err: any) {
       toast("Attempt failed while signing user", {

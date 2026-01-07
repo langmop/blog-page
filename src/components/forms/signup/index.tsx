@@ -14,9 +14,12 @@ import addUser from "@/lib/actions/auth/add-user-action";
 import { SignupSchema, type SignupInput } from "@/lib/validators/signup.schema";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { AuthContext } from "@/contexts/auth/provider";
 
 export function Signup({ onSuccess }: { onSuccess: () => void }) {
   const router = useRouter();
+  const { setUser } = useContext(AuthContext);
   const form = useForm<SignupInput>({
     resolver: zodResolver(SignupSchema),
     defaultValues: {
@@ -32,13 +35,16 @@ export function Signup({ onSuccess }: { onSuccess: () => void }) {
       const response = await addUser(data);
       if (response.id) {
         toast.success("User created successfully");
+        setUser({
+          userId: String(response?.id),
+        });
       }
     } catch (err: any) {
       toast("Attempt failed while creating user", {
         description: err.message,
       });
     } finally {
-      onSuccess()
+      onSuccess();
       router.push("/admin");
       router.refresh();
     }

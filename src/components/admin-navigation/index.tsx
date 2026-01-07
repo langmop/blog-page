@@ -38,7 +38,6 @@ function Navigation() {
   };
 
   const { user } = useContext(AuthContext);
-
   return (
     <div className="flex w-full mt-4">
       <div className="flex-1">
@@ -60,7 +59,7 @@ function Navigation() {
           </NavigationMenuList>
         </NavigationMenu>
       </div>
-      {user?.userId ? null : (
+      {!!user?.userId ? null : (
         <div className="w-fit mr-2">
           <Auth
             buttonName="Signup"

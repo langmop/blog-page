@@ -9,6 +9,6 @@ export async function setSessionCookie(sessionId: string) {
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 60, // 10 minutes
+    maxAge:  +(process.env.SESSION_LIVE_AGE ?? 0), // 10 minutes
   });
 }

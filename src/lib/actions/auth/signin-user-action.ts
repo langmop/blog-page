@@ -42,11 +42,10 @@ export default async function signInUser(
     }
 
     const sessionId = crypto.randomBytes(32).toString("hex");
-
     await redis.set(
       sessionId,
       JSON.stringify({ userId: user.id }),
-      { ex: 30 } // 10 minutes
+      { ex: +(process.env.SESSION_LIVE_AGE ?? 0) } // 10 minutes
     );
 
     await setSessionCookie(sessionId);
