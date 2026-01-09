@@ -14,10 +14,28 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
+  email         String         @unique
+  password      String? // nullable for OAuth-only users
+  authProviders AuthProvider[] // relation
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model AuthProvider {
+  id         Int      @id @default(autoincrement())
+  provider   AuthType
+  providerId String // GitHub user id, Google sub, Discord id, etc
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([provider, providerId]) // prevents duplicates
+  @@unique([userId, provider]) // one provider per user
+}
+
+enum AuthType {
+  discord
+  google
 }
