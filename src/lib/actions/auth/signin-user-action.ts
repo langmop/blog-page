@@ -35,7 +35,7 @@ export default async function signInUser(
 
     const { password, username } = userDetails;
 
-    const isCorrectPassword = await isPasswordSame(password, user.password);
+    const isCorrectPassword = await isPasswordSame(password, user?.password ?? '');
 
     if (!isCorrectPassword) {
       throw new Error("Username or Password is wrong");

@@ -15,6 +15,8 @@ import signInUser from "@/lib/actions/auth/signin-user-action";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { AuthContext } from "@/contexts/auth/provider";
+import { Separator } from "@/components/ui/separator";
+import { oAuthSign } from "@/lib/actions/auth/provider-auth-action";
 
 export function Signin({ onSuccess }: { onSuccess: () => void }) {
   const router = useRouter();
@@ -94,6 +96,14 @@ export function Signin({ onSuccess }: { onSuccess: () => void }) {
         className="mt-3"
       >
         Submit
+      </Button>
+      <Separator />
+      <Button
+        onClick={() => {
+          oAuthSign("discord");
+        }}
+      >
+        Google
       </Button>
     </form>
   );
