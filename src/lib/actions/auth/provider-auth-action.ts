@@ -7,5 +7,5 @@ import { redirect } from "next/navigation";
 
 export async function oAuthSign(provider: AuthType) {
   // get oAuth url;
-  redirect(new OAuthClient().createAuth(await cookies()));
+  redirect(await new OAuthClient().createAuth(await cookies(), provider));
 }

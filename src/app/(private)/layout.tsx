@@ -5,7 +5,6 @@ import { ReactNode } from "react";
 
 async function AdminLayout({ children }: { children: ReactNode }) {
   const user = await verifyUserSession();
-  console.log(user)
   return (
     <AuthProvider initialUser={user}>
       <Navigation />

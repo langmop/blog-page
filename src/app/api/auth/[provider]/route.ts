@@ -27,11 +27,10 @@ export async function GET(
     );
   }
 
-  const user = await new OAuthClient().fetchUser(code, state, await cookies());
+  const user = await new OAuthClient().fetchUser(code, state, await cookies(), provider);
   const connectedUser = await connectUser({
     ...user,
     provider,
   });
-  console.log(connectedUser)
   redirect("/admin/dashboard");
 }
