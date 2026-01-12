@@ -5,7 +5,7 @@ import { AuthType } from "@/generated/prisma/enums";
 import { AUTH_INFO } from "@/constants/auth";
 
 const STATE_COOKIE_KEY = "oAuthState";
-const VERIFIER_COOKIE_KEY = "oAuthState";
+const VERIFIER_COOKIE_KEY = "oAuthVerifier";
 const COOKIE_EXPIRATION_SECONDS = 60 * 10;
 export class OAuthClient {
   private readonly tokenSchema = z.object({
@@ -15,13 +15,14 @@ export class OAuthClient {
 
   private readonly userSchema = z.object({
     id: z.string(),
-    username: z.string(),
-    global_name: z.string().nullable(),
-    email: z.string().email(),
+    username: z.string().optional(),
+    global_name: z.string().nullable().optional(),
+    email: z.string().email().optional(),
+    name: z.string().optional(),
   });
 
-  private get redirectUrl() {
-    return new URL("discord", process?.env?.OAUTH_REDIRECT_URL_BASE);
+  redirectUrl(provider: AuthType) {
+    return new URL(provider, process?.env?.OAUTH_REDIRECT_URL_BASE);
   }
 
   async createAuth(cookies: Cookies, provider: AuthType) {
@@ -33,7 +34,7 @@ export class OAuthClient {
       "client_id",
       process?.env?.[AUTH_INFO[provider]?.clientIdKey] ?? ""
     );
-    url.searchParams.set("redirect_uri", this.redirectUrl.toString());
+    url.searchParams.set("redirect_uri", this.redirectUrl(provider).toString());
     url.searchParams.set("response_type", "code");
     url.searchParams.set("scope", AUTH_INFO[provider]?.scope);
     url.searchParams.set("state", state);
@@ -62,15 +63,16 @@ export class OAuthClient {
     })
       .then((res) => res.json())
       .then((rawData) => {
-        const { data, success, error } = this.userSchema.safeParse(rawData);
+        const { data, success, error } = rawData["data"]
+          ? this.userSchema.safeParse(rawData?.data)
+          : this.userSchema.safeParse(rawData);
         if (!success) throw new InvalidUserError(error);
         return data;
       });
-    console.log(user, 'dddd')
     return {
       id: user?.id,
-      email: user?.email,
-      name: user?.global_name ?? user?.username,
+      email: user?.email ?? user?.username,
+      name: user?.global_name ?? user?.name ?? user?.username,
     };
   }
 
@@ -84,10 +86,15 @@ export class OAuthClient {
       },
       body: new URLSearchParams({
         code,
-        redirect_uri: this.redirectUrl.toString(),
+        redirect_uri: this.redirectUrl(provider).toString(),
         grant_type: "authorization_code",
         client_id: process.env?.[AUTH_INFO[provider]?.clientIdKey] ?? "",
-        client_secret: process.env?.[AUTH_INFO[provider]?.secretIdKey] ?? "",
+        ...(AUTH_INFO?.[provider]?.isPKCE
+          ? {}
+          : {
+              client_secret:
+                process.env?.[AUTH_INFO[provider]?.secretIdKey] ?? "",
+            }),
         code_verifier: code_verifier,
       }),
     })
@@ -152,7 +159,6 @@ function generateCodeVerifier(cookies: Pick<Cookies, "set">, length = 64) {
       sameSite: "lax",
       expires: new Date(Date.now() + COOKIE_EXPIRATION_SECONDS * 1000),
     });
-
   return verifier;
 }
 

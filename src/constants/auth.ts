@@ -9,6 +9,7 @@ export const AUTH_INFO: Record<
     scope: string;
     tokenURL: string;
     userDetailsURL: string;
+    isPKCE:  boolean;
   }
 > = {
   discord: {
@@ -18,6 +19,7 @@ export const AUTH_INFO: Record<
     tokenURL: "https://discord.com/api/oauth2/token",
     secretIdKey: "DISCORD_CLIENT_SECRET",
     userDetailsURL: "https://discord.com/api/users/@me",
+    isPKCE: false
   },
   google: {
     authorizeURL: "",
@@ -26,13 +28,15 @@ export const AUTH_INFO: Record<
     tokenURL: "",
     secretIdKey: "",
     userDetailsURL: "",
+    isPKCE: true
   },
   x: {
     authorizeURL: "https://x.com/i/oauth2/authorize",
     clientIdKey: "X_CLIENT_ID",
-    scope: "users.email offline.access",
+    scope: "users.email offline.access users.read tweet.read",
     tokenURL: "https://api.x.com/2/oauth2/token",
     secretIdKey: "X_CLIENT_SECRET",
     userDetailsURL: "https://api.x.com/2/users/me",
+    isPKCE: true,
   },
 };

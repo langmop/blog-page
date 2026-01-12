@@ -15,10 +15,10 @@ datasource db {
 
 model User {
   id            Int            @id @default(autoincrement())
-  name          String         @unique
-  email         String         @unique
-  password      String? // nullable for OAuth-only users
-  authProviders AuthProvider[] // relation
+  name          String?
+  email         String?        @unique
+  password      String? // null for OAuth users
+  authProviders AuthProvider[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 }
@@ -38,4 +38,5 @@ model AuthProvider {
 enum AuthType {
   discord
   google
+  x
 }

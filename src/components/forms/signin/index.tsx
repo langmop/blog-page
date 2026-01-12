@@ -105,6 +105,13 @@ export function Signin({ onSuccess }: { onSuccess: () => void }) {
       >
         Google
       </Button>
+      <Button
+        onClick={() => {
+          oAuthSign("x");
+        }}
+      >
+        X
+      </Button>
     </form>
   );
 }
