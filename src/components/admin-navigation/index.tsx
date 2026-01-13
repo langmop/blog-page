@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UNAUTH_NAVIGATIONS } from "./constants";
+import { UNAUTH_NAVIGATIONS, AUTH_NAVIGATIONS } from "./constants";
 import { useCallback, useContext, useState } from "react";
 import classNames from "classnames";
 import {
@@ -16,7 +16,8 @@ import {
 import Auth from "../auth";
 import { Signup } from "../forms/signup";
 import { Signin } from "../forms/signin";
-import AuthProvider, { AuthContext } from "@/contexts/auth/provider";
+import { AuthContext } from "@/contexts/auth/provider";
+import Logout from "../auth/logout";
 
 function Navigation() {
   const pathname = usePathname();
@@ -43,23 +44,27 @@ function Navigation() {
       <div className="flex-1">
         <NavigationMenu className="m-auto">
           <NavigationMenuList className="flex-wrap flex">
-            {UNAUTH_NAVIGATIONS?.map(({ href, icon, name }) => (
-              <NavigationMenuItem key={name} className="bg-">
-                <NavigationMenuLink
-                  asChild
-                  className={classNames(
-                    navigationMenuTriggerStyle(),
-                    isActive(href) && "bg-accent! text-accent-foreground"
-                  )}
-                >
-                  <Link href={href}>{icon}</Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-            ))}
+            {(!!user?.userId ? AUTH_NAVIGATIONS : UNAUTH_NAVIGATIONS)?.map(
+              ({ href, icon, name }) => (
+                <NavigationMenuItem key={name} className="bg-">
+                  <NavigationMenuLink
+                    asChild
+                    className={classNames(
+                      navigationMenuTriggerStyle(),
+                      isActive(href) && "bg-accent! text-accent-foreground"
+                    )}
+                  >
+                    <Link href={href}>{icon}</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              )
+            )}
           </NavigationMenuList>
         </NavigationMenu>
       </div>
-      {!!user?.userId ? null : (
+      {!!user?.userId ? (
+        <Logout />
+      ) : (
         <div className="w-fit mr-2">
           <Auth
             buttonName="Signup"

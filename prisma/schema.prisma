@@ -13,16 +13,6 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id            Int            @id @default(autoincrement())
-  name          String?
-  email         String?        @unique
-  password      String? // null for OAuth users
-  authProviders AuthProvider[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-}
-
 model AuthProvider {
   id         Int      @id @default(autoincrement())
   provider   AuthType
@@ -39,4 +29,43 @@ enum AuthType {
   discord
   google
   x
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  name          String?
+  email         String?        @unique
+  password      String? // null for OAuth users
+  authProviders AuthProvider[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  blogs         Blog[]
+}
+
+model Blog {
+  id          Int         @id @default(autoincrement())
+  slug        String      @unique
+  title       String
+  content     String
+  contentType ContentType @default(MARKDOWN)
+
+  authorId Int
+  author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  status    BlogStatus @default(DRAFT)
+  isEnabled Boolean    @default(true)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+}
+
+enum ContentType {
+  MARKDOWN
+  JSON
+}
+
+enum BlogStatus {
+  DRAFT
+  PUBLISHED
 }

@@ -13,9 +13,15 @@ export const AUTH_NAVIGATIONS = [
   },
   {
     name: "Dashboard",
-    href: "/dashboard",
+    href: "/admin/dashboard",
     activeColor: "text-blue-300",
     icon: <div>Dashboard</div>,
+  },
+  {
+    name: "new-blog",
+    href: "/admin/blog/new",
+    activeColor: "text-blue-300",
+    icon: <div>New Blog</div>,
   },
 ];
 
