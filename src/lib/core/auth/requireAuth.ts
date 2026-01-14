@@ -5,14 +5,12 @@ import { prisma } from "../../../../lib/db";
 export async function requireAuth() {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get(process.env.SESSION_COOKIE_NAME!)?.value;
-
   if (!sessionId) {
     throw new Error("UNAUTHORIZED");
   }
 
-  const rawUserId = await redis.get(sessionId);
+  const {userId: rawUserId} = await redis.get(sessionId) as any;
   const userId = Number(rawUserId);
-
   if (!userId) {
     throw new Error("UNAUTHORIZED");
   }
