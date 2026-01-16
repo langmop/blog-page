@@ -1,31 +1,30 @@
 "use client";
-import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AdminBlogsPage from "./blog-listing";
+import { BlogStatus } from "@/generated/prisma/enums";
+import { useRouter, useSearchParams } from "next/navigation";
 
 function BlogListingClient() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   return (
     <Tabs
       defaultValue="all-blogs"
       className="w-[400px]"
-      onChange={(data) => {
-        console.log(data);
+      onValueChange={(data) => {
+        const params = new URLSearchParams(searchParams);
+        params.set("status", data);
+        router.push(`?${params.toString()}`);
       }}
     >
       <TabsList>
         <TabsTrigger value="all-blogs">All Blogs</TabsTrigger>
-        <TabsTrigger value="drafts">Drafts</TabsTrigger>
-        <TabsTrigger value="published">Published</TabsTrigger>
+        <TabsTrigger value={BlogStatus.DRAFT}>Drafts</TabsTrigger>
+        <TabsTrigger value={BlogStatus.PUBLISHED}>Published</TabsTrigger>
       </TabsList>
-      <TabsContent value="all-blogs">
-        <AdminBlogsPage />
-      </TabsContent>
-      <TabsContent value="drafts">
-        <AdminBlogsPage />
-      </TabsContent>
-      <TabsContent value="published">
-        <AdminBlogsPage />
-      </TabsContent>
+      <TabsContent value="all-blogs" />
+      <TabsContent value={BlogStatus.DRAFT} />
+      <TabsContent value={BlogStatus.PUBLISHED} />
     </Tabs>
   );
 }

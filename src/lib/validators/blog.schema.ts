@@ -6,6 +6,7 @@ export const CreateBlogSchema = z.object({
   content: z.string().min(1),
   status: z.enum(BlogStatus),
   slug: z.string().min(1),
+  state: z.boolean().optional()
 });
 
 export type CreateBlog = z.infer<typeof CreateBlogSchema>;

@@ -4,8 +4,7 @@ import { BlogStatus } from "@/generated/prisma/enums";
 import { requireAuth } from "@/lib/core/auth/requireAuth";
 import { prisma } from "../../../../lib/db";
 
-
-interface IBlogListing {
+export interface IBlogListing {
   status?: BlogStatus;
   isEnabled?: boolean;
 }
@@ -17,7 +16,11 @@ export async function fetchBlogsAdmin(filters: IBlogListing = {}) {
     where: {
       authorId: user.id,
 
-      ...(filters.status && { status: filters.status }),
+      ...(filters.status &&
+        (filters?.status === BlogStatus.DRAFT ||
+          filters?.status === BlogStatus.PUBLISHED) && {
+          status: filters.status,
+        }),
       ...(filters.isEnabled !== undefined && {
         isEnabled: filters.isEnabled,
       }),

@@ -1,12 +1,24 @@
-import { fetchBlogsAdmin } from "@/lib/actions/blog/fetch-blog-action";
+import {
+  fetchBlogsAdmin,
+  IBlogListing,
+} from "@/lib/actions/blog/fetch-blog-action";
+import Link from "next/link";
 
-export default async function AdminBlogsPage() {
-  const blogs = await fetchBlogsAdmin();
+export default async function AdminBlogsPage({
+  searchParams,
+}: {
+  searchParams: Promise<IBlogListing>;
+}) {
+  const { isEnabled, status } = await searchParams;
+
+  const blogs = await fetchBlogsAdmin({ isEnabled, status });
 
   return (
-    <div>
-      {blogs?.map(({ title, id }) => (
-        <div key={id}>{title}</div>
+    <div className="flex flex-col">
+      {blogs.map(({ id, title }) => (
+        <Link href={`/admin/blog/${id}`} key={id}>
+          {title}
+        </Link>
       ))}
     </div>
   );
