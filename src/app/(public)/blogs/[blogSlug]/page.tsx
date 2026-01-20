@@ -9,11 +9,11 @@ async function BlogPage({
   }>;
 }) {
   const { blogSlug } = await params;
-  const { status, message, data } = await getBlogWithSlug(blogSlug);
+  const { status, data } = await getBlogWithSlug(blogSlug);
   return status === "failed" ? (
     <div>Failed to load data</div>
   ) : (
-    <div>{data?.content}</div>
+    <div>{data?.currentVersion?.content}</div>
   );
 }
 

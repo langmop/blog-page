@@ -8,6 +8,9 @@ export async function getBlogWithSlug(slug: string) {
       where: {
         slug,
       },
+      select: {
+        currentVersion: true
+      }
     });
 
     return {

@@ -1,6 +1,5 @@
 "use server";
 
-import { BlogStatus } from "@/generated/prisma/enums";
 import { requireAuth } from "@/lib/core/auth/requireAuth";
 import { prisma } from "../../../../lib/db";
 
@@ -12,30 +11,46 @@ export default async function updateBlog({
   status,
   title,
   id,
-  state
+  state,
 }: CreateBlog & {
   id: number;
 }) {
   try {
     const user = await requireAuth();
-    const blog = await prisma.blog.update({
-      where: {
-        id,
-        authorId: user?.id,
-      },
-      data: {
-        content,
-        slug,
-        title,
-        status,
-        isEnabled: state,
-        authorId: user?.id,
-      },
+
+    return await prisma.$transaction(async (tx) => {
+      const blog = await tx.blog.update({
+        where: {
+          id,
+          authorId: user?.id,
+        },
+        data: {
+          slug,
+          status,
+          isEnabled: state,
+          authorId: user?.id,
+        },
+        select: {
+          versions: true,
+          id: true,
+        },
+      });
+
+      await tx.blogVersion.create({
+        data: {
+          content,
+          title,
+          versionNumber: blog?.versions?.length + 1,
+          blogId: blog.id,
+        },
+      });
+
+      return {
+        status: "SUCCESS",
+        blog,
+        reason: ''
+      };
     });
-    return {
-      status: "SUCCESS",
-      blog,
-    };
   } catch (err) {
     return {
       status: "FAIL",

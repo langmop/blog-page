@@ -9,6 +9,10 @@ export async function fetchBlogPublic() {
         isEnabled: true,
         status: "PUBLISHED",
       },
+      select: {
+        currentVersion: true,
+        slug: true
+      }
     });
 
     return {

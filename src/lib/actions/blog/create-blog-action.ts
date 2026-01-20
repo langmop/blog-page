@@ -19,20 +19,43 @@ export default async function createBlog({
 }: ICreateBlog) {
   try {
     const user = await requireAuth();
-    const blog = await prisma.blog.create({
-      data: {
-        content,
-        slug,
-        title,
-        status,
-        authorId: user?.id,
-      },
+
+    return await prisma.$transaction(async (tx) => {
+      // 1️⃣ Create blog first (currentVersionId nullable)
+      const blog = await tx.blog.create({
+        data: {
+          slug,
+          status,
+          authorId: user.id,
+        },
+      });
+
+      // 2️⃣ Create first version
+      const blogVersion = await tx.blogVersion.create({
+        data: {
+          content,
+          title,
+          versionNumber: 1,
+          blogId: blog.id,
+        },
+      });
+
+      // 3️⃣ Update blog to set currentVersionId
+      await tx.blog.update({
+        where: { id: blog.id },
+        data: {
+          currentVersionId: blogVersion.id,
+        },
+      });
+
+      return {
+        status: "SUCCESS",
+        blog,
+        currentVersion: blogVersion,
+      };
     });
-    return {
-      status: "SUCCESS",
-      blog,
-    };
   } catch (err) {
+    console.error(err);
     return {
       status: "FAIL",
       reason: (err as any)?.message ?? "",

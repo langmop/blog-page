@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redis } from "../../../../lib/redis";
 import { prisma } from "../../../../lib/db";
+import logout from "@/lib/actions/auth/logout-action";
 
 export async function requireAuth() {
   const cookieStore = await cookies();
@@ -20,6 +21,7 @@ export async function requireAuth() {
   });
 
   if (!user) {
+    await logout();
     throw new Error("UNAUTHORIZED");
   }
 

@@ -12,11 +12,12 @@ export default async function AdminBlogsPage({
   const { isEnabled, status } = await searchParams;
 
   const blogs = await fetchBlogsAdmin({ isEnabled, status });
-
   return (
     <div className="flex flex-col">
-      {blogs.map(({ id, title }) => (
-        <Link href={`/admin/blog/${id}`} key={id}>
+      {blogs.map(({ id, currentVersionId, currentVersion: {
+        title
+      } }) => (
+        <Link href={`/admin/blog/${id}/version/${currentVersionId}`} key={id}>
           {title}
         </Link>
       ))}

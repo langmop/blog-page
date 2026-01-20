@@ -9,7 +9,7 @@ async function BlogsListing() {
   ) : (
     <div>
       {!blogs?.length && <div>Sorry No blogs right now, come back later</div>}
-      {blogs?.map(({ title, slug }) => (
+      {blogs?.map(({ slug, currentVersion: { title } }) => (
         <Link href={`/blogs/${slug}`}>{title}</Link>
       ))}
     </div>

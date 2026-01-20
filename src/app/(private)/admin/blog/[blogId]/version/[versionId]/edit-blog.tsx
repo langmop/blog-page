@@ -57,7 +57,7 @@ export default function EditBlog({
 
   return (
     <form
-      className="p-4 flex gap-2 flex-col"
+      className="flex gap-2 flex-col flex-1"
       id="form-signup"
       onSubmit={form.handleSubmit(onSubmit)}
     >

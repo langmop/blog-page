@@ -12,7 +12,7 @@ export interface IBlogListing {
 export async function fetchBlogsAdmin(filters: IBlogListing = {}) {
   const user = await requireAuth();
 
-  return prisma.blog.findMany({
+  return prisma?.blog?.findMany({
     where: {
       authorId: user.id,
 
@@ -27,6 +27,10 @@ export async function fetchBlogsAdmin(filters: IBlogListing = {}) {
     },
     orderBy: {
       createdAt: "desc",
-    },
+    }, select: {
+      currentVersion: true,
+      id: true,
+      currentVersionId: true
+    }
   });
 }
