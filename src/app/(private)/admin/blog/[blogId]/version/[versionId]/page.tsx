@@ -1,6 +1,7 @@
 import getBlogData from "@/lib/actions/blog/get-blog-auth-action";
 import EditBlog from "./edit-blog";
 import VersionListing from "./version-listing";
+import { BlogStatus } from "@/generated/prisma/enums";
 
 async function UpdateBlog({
   params,
@@ -12,32 +13,38 @@ async function UpdateBlog({
 }) {
   const { blogId, versionId } = await params;
 
-  const { status, blogData, message, currentVersion: currentVersionData } = await getBlogData(+blogId, +versionId);
+  const {
+    status,
+    blogData,
+    message,
+    currentVersion: currentVersionData,
+  } = await getBlogData(+blogId, +versionId);
   const {
     status: blogStatus,
     id,
     slug,
     isEnabled,
-    currentVersion: { versionNumber },
+    currentVersion,
     versions,
   } = blogData!;
-
   return status !== "success" ? (
     <div>No Data found, {message}</div>
   ) : (
     <div className="flex w-full p-2 gap-4">
       <VersionListing
-        publishedVersion={versionNumber}
+        publishedVersion={
+          blogStatus === BlogStatus.PUBLISHED ? (currentVersion?.id ?? 0) : 0
+        }
         currentVersion={+versionId}
         versions={versions}
         blogId={+blogId}
       />
       <EditBlog
         blogId={id}
-        content={currentVersionData?.content ?? ''}
+        content={currentVersionData?.content ?? ""}
         slug={slug}
         status={blogStatus}
-        title={currentVersionData?.title ?? ''}
+        title={currentVersionData?.title ?? ""}
         state={isEnabled}
       />
     </div>

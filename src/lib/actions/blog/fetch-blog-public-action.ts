@@ -1,5 +1,6 @@
 "use server";
 
+import { BlogStatus } from "@/generated/prisma/enums";
 import { prisma } from "../../../../lib/db";
 
 export async function fetchBlogPublic() {
@@ -7,14 +8,13 @@ export async function fetchBlogPublic() {
     const blogs = await prisma?.blog?.findMany({
       where: {
         isEnabled: true,
-        status: "PUBLISHED",
+        status: BlogStatus.PUBLISHED
       },
       select: {
         currentVersion: true,
         slug: true
       }
     });
-
     return {
       status: "success",
       blogs,

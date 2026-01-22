@@ -1,6 +1,10 @@
-"use client"
+"use client";
 import { Button } from "@/components/ui/button";
 import { BlogVersion } from "@/generated/prisma/client";
+import {
+  draftCurrentVersion,
+  publishCurrentVersion,
+} from "@/lib/actions/blog/toggle-blog-action";
 import classNames from "classnames";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -21,22 +25,41 @@ function VersionListing({
       {publishedVersion}
       <div>Versions</div>
       <div className="flex flex-col gap-4">
-        {versions?.map(({ versionNumber }) => (
+        {versions?.map(({ versionNumber, id }) => (
           <div
-            onClick={() =>
-              redirect(`/admin/blog/${blogId}/version/${versionNumber}`)
-            }
             className={classNames("flex flex-col border p-2 rounded-sm", {
-              "bg-green-200": currentVersion === versionNumber,
+              "bg-green-200": currentVersion === id,
             })}
           >
             <div>Version {versionNumber}</div>
             <div className="flex items-center gap-3">
-              <Button>Edit</Button>
-              {publishedVersion === versionNumber ? (
-                <Button>Draft</Button>
+              <Button
+                onClick={() => redirect(`/admin/blog/${blogId}/version/${id}`)}
+              >
+                Edit
+              </Button>
+              {publishedVersion === id ? (
+                <Button
+                  onClick={() =>
+                    draftCurrentVersion({
+                      blogId,
+                      versionId: id,
+                    })
+                  }
+                >
+                  Draft
+                </Button>
               ) : (
-                <Button>Published</Button>
+                <Button
+                  onClick={() =>
+                    publishCurrentVersion({
+                      blogId,
+                      versionId: id,
+                    })
+                  }
+                >
+                  Publish
+                </Button>
               )}
             </div>
           </div>

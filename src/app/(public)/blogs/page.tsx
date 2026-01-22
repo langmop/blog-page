@@ -9,9 +9,11 @@ async function BlogsListing() {
   ) : (
     <div>
       {!blogs?.length && <div>Sorry No blogs right now, come back later</div>}
-      {blogs?.map(({ slug, currentVersion: { title } }) => (
-        <Link href={`/blogs/${slug}`}>{title}</Link>
-      ))}
+      <div className="flex flex-col">
+        {blogs?.map(({ slug, currentVersion: { title } }) => (
+          <Link href={`/blogs/${slug}`}>{title}</Link>
+        ))}
+      </div>
     </div>
   );
 }

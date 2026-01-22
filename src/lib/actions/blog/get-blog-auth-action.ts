@@ -23,8 +23,7 @@ export default async function getBlogData(id: number, versionId: number) {
 
     const currentVersion = await prisma?.blogVersion?.findFirst({
       where: {
-       versionNumber: versionId,
-       blogId: id
+       id: versionId ?? 0
       },
     });
 
