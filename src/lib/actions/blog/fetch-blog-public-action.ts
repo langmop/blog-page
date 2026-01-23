@@ -12,7 +12,7 @@ export async function fetchBlogPublic() {
       },
       select: {
         currentVersion: true,
-        slug: true
+        slug: true,
       }
     });
     return {
