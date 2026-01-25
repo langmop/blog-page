@@ -81,3 +81,21 @@ enum BlogStatus {
   DRAFT
   PUBLISHED
 }
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  ARCHIVED
+}
+
+model Comment {
+  id            Int           @id @default(autoincrement())
+  commentText   String
+  selectedText  String
+  status        CommentStatus @default(PENDING)
+  blogId        Int
+  blogVersionId Int
+  startIndex    Int
+  endIndex      Int
+  createdAt     DateTime      @default(now())
+}

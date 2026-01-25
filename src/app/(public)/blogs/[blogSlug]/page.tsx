@@ -1,6 +1,6 @@
 import { getBlogWithSlug } from "@/lib/actions/blog/get-blog-with-slug";
-import markdownToTxt from 'markdown-to-txt';
 import Markdown from 'react-markdown'
+import TextSelection from "./text-selection";
 
 
 async function BlogPage({
@@ -18,6 +18,7 @@ async function BlogPage({
     <div className="m-3">
       <div className="text-4xl">{data?.currentVersion?.title}</div>
       <div><Markdown>{data?.currentVersion?.content}</Markdown></div>
+      <TextSelection />
     </div>
   );
 }
