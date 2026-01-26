@@ -9,7 +9,7 @@ function TextSelection() {
     rect: DOMRect | null;
   } | null>(null);
   console.log(selection?.rect, 'gggggggg');
-  const [comment, setComment] = useState("");
+  const [comment, setComent] = useState("");
 
   const popoverRef = useRef<HTMLDivElement | null>(null);
   function onSelectionStart(e: Event) {
