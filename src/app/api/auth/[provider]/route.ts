@@ -28,8 +28,18 @@ export async function GET(
   }
 
   const user = await new OAuthClient().fetchUser(code, state, await cookies(), provider);
+  if (!user.email) {
+    return redirect(
+      `/admin?oauthError=${encodeURIComponent(
+        "Failed to retrieve user email from provider"
+      )}`
+    );
+  }
+
   const connectedUser = await connectUser({
     ...user,
+    email: user.email,
+    name: user.name || user.email,
     provider,
   });
   redirect("/admin/dashboard");

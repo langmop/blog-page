@@ -3,16 +3,41 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useRef, useState } from "react";
 
+function highlightRange(range: Range) {
+  const span = document.createElement("span");
+  span.style.backgroundColor = "#fde68a"; // highlight color
+  span.style.borderRadius = "4px";
+  span.style.padding = "0 2px";
+  span.dataset.highlight = "true";
+
+  range.surroundContents(span);
+}
+
+function removeAllHighlights() {
+  document.querySelectorAll('[data-highlight="true"]').forEach((el) => {
+    const parent = el.parentNode;
+    if (!parent) return;
+
+    while (el.firstChild) {
+      parent.insertBefore(el.firstChild, el);
+    }
+    parent.removeChild(el);
+  });
+}
+
 function TextSelection() {
   const [selection, setSelection] = useState<{
     text: string;
     rect: DOMRect | null;
   } | null>(null);
-  console.log(selection?.rect, 'gggggggg');
-  const [comment, setComent] = useState("");
+  const [comment, setComment] = useState("");
 
   const popoverRef = useRef<HTMLDivElement | null>(null);
   function onSelectionStart(e: Event) {
+    if (popoverRef.current && popoverRef.current.contains(e.target as Node)) {
+      return;
+    }
+    removeAllHighlights();
     setSelection({
       text: "",
       rect: null,
@@ -26,6 +51,7 @@ function TextSelection() {
 
     const sel = window.getSelection();
     if (!sel || sel.rangeCount === 0) {
+      removeAllHighlights();
       setSelection(null);
       return;
     }
@@ -34,12 +60,13 @@ function TextSelection() {
     const text = sel.toString().trim();
 
     if (!text) {
+      removeAllHighlights();
       setSelection(null);
       return;
     }
 
     const rect = range.getBoundingClientRect();
-
+    highlightRange(range);
     setSelection({
       text,
       rect,
@@ -56,7 +83,7 @@ function TextSelection() {
     };
   }, []);
 
-  const top = (selection?.rect?.top ?? 0) + window.scrollY - 40;
+  const top = (selection?.rect?.top ?? 0) + (window ? window.scrollY : 0) - 40;
   const left =
     (selection?.rect?.left ?? 0) +
     (selection?.rect?.width ?? 0) / 2 +
